@@ -1,4 +1,4 @@
-import { Box, Typography, Grid } from "@mui/material";
+import { Box, Typography, Grid, Button } from "@mui/material";
 import { memo } from "react";
 
 import colors from "../_colors.scss";
@@ -19,6 +19,8 @@ const Card = ({
 	width = "100%",
 	height = "auto",
 	padding = "10px",
+	onExport = null,
+	exportTestId = null,
 }) => (
 	<Box
 		sx={{
@@ -36,13 +38,24 @@ const Card = ({
 				padding="10px 20px"
 				display="flex"
 				flexDirection="row"
-				justifyContent="center"
+				justifyContent={onExport ? "space-between" : "center"}
 				alignItems="center"
 			>
 				{typeof title === "string" ? (
 					<Typography variant="body" component="h2" fontSize={titleFontSize}>{title}</Typography>
 				) : (
 					title
+				)}
+				{onExport && (
+					<Button
+						size="small"
+						variant="outlined"
+						onClick={onExport}
+						data-testid={exportTestId}
+						sx={{ color: "inherit", borderColor: "rgba(255,255,255,0.6)", fontSize: "0.7rem", py: 0.25, px: 1, whiteSpace: "nowrap", ml: 1 }}
+					>
+						{"Export CSV"}
+					</Button>
 				)}
 			</Grid>
 		)}

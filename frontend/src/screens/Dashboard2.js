@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Grid, Typography } from "@mui/material";
+import exportCsv from "../utils/export-csv.js";
 import Dropdown from "../components/Dropdown.js";
 import Card from "../components/Card.js";
 import Plot from "../components/Plot.js";
@@ -39,7 +40,15 @@ const Dashboard = () => {
 
             <Grid container spacing={2}>
                 <Grid item sm={12} md={6}>
-                    <Card title="Quarterly Sales Distribution">
+                    <Card
+                        title="Quarterly Sales Distribution"
+                        onExport={() => exportCsv("quarterly-sales-distribution", [
+                            { y: data?.quarterlySalesDistribution?.Q1, title: "Q1" },
+                            { y: data?.quarterlySalesDistribution?.Q2, title: "Q2" },
+                            { y: data?.quarterlySalesDistribution?.Q3, title: "Q3" },
+                        ])}
+                        exportTestId="export-csv-quarterly-sales"
+                    >
                         <Plot
                             data={[
                                 {
@@ -69,7 +78,15 @@ const Dashboard = () => {
                     </Card>
                 </Grid>
                 <Grid item sm={12} md={6}>
-                    <Card title="Budget vs Actual Spending">
+                    <Card
+                        title="Budget vs Actual Spending"
+                        onExport={() => exportCsv("budget-vs-actual", [
+                            { x: ["January", "February", "March", "April", "May", "June"], y: Object.values(data?.budgetVsActual || {}).map((m) => m.budget), title: "Budget" },
+                            { x: ["January", "February", "March", "April", "May", "June"], y: Object.values(data?.budgetVsActual || {}).map((m) => m.actual), title: "Actual" },
+                            { x: ["January", "February", "March", "April", "May", "June"], y: Object.values(data?.budgetVsActual || {}).map((m) => m.forecast), title: "Forecast" },
+                        ])}
+                        exportTestId="export-csv-budget-vs-actual"
+                    >
                         <Plot
                             data={[
                                 {
@@ -102,7 +119,15 @@ const Dashboard = () => {
                     </Card>
                 </Grid>
                 <Grid item sm={12}>
-                    <Card title="Performance Over Time">
+                    <Card
+                        title="Performance Over Time"
+                        onExport={() => exportCsv("performance-over-time", [
+                            { x: Array.from({ length: 20 }, (_, i) => i + 1), y: data?.timePlot?.projected, title: "Projected" },
+                            { x: Array.from({ length: 20 }, (_, i) => i + 1), y: data?.timePlot?.actual, title: "Actual" },
+                            { x: Array.from({ length: 20 }, (_, i) => i + 1), y: data?.timePlot?.historicalAvg, title: "Historical Avg" },
+                        ])}
+                        exportTestId="export-csv-performance"
+                    >
                         <Plot
                             data={[
                                 {
