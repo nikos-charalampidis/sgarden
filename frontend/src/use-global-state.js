@@ -9,6 +9,12 @@ export default create(persist(
 		setDefaultPageSize: (defaultPageSize) => setState({ defaultPageSize }),
 		darkMode: false,
 		toggleDarkMode: () => setState((state) => ({ darkMode: !state.darkMode })),
+		favorites: [],
+		toggleFavorite: (path) => setState((state) => ({
+			favorites: state.favorites.includes(path)
+				? state.favorites.filter((p) => p !== path)
+				: [...state.favorites, path]
+		})),
 	}),
 	{
 		name: "sgarden",

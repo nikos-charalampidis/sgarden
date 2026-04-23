@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
-import { Grid, Typography, Box, Button, TextField } from "@mui/material";
+import { Grid, Typography, Box, Button, TextField, IconButton } from "@mui/material";
+import { Star, StarBorder } from "@mui/icons-material";
+import useGlobalState from "../use-global-state.js";
 import exportCsv from "../utils/export-csv.js";
 import Dropdown from "../components/Dropdown.js";
 import Card from "../components/Card.js";
@@ -21,6 +23,8 @@ const Dashboard = () => {
     const [toDate, setToDate] = useState(new Date());
     const [months, setMonths] = useState([]);
     const [data, setData] = useState({ keyMetric: { date: randomDate(), value: generateRandomData(0, 100) }, revenue: [], expenses: [], profit: [], growthRate: [] });
+    const { favorites, toggleFavorite } = useGlobalState();
+    const isFavorite = favorites.includes("/dashboard1");
 
     const changePlotData = (fromD, toD) => {
         if (fromD && toD) {
@@ -61,8 +65,11 @@ const Dashboard = () => {
 
     return (
         <Grid container py={2} flexDirection="column">
-            <Typography variant="h4" gutterBottom color="white.main">
+            <Typography variant="h4" gutterBottom color="white.main" display="flex" alignItems="center">
                 Analytics
+                <IconButton data-testid="bookmark-toggle-dashboard1" onClick={() => toggleFavorite("/dashboard1")} sx={{ ml: 1 }}>
+                    {isFavorite ? <Star data-testid="bookmark-active-dashboard1" sx={{ color: "gold" }} /> : <StarBorder sx={{ color: "white" }} />}
+                </IconButton>
             </Typography>
 
             <Grid item style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", marginBottom: "20px" }}>
