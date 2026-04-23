@@ -62,12 +62,11 @@ router.post("/createUserInvited",
 				email: userEmail,
 			}).save();
 
+			await Invitation.deleteOne({ token });
 			return res.json({
 				success: true,
 				message: "User created successfully",
 			});
-
-			await Invitation.deleteOne({ token });
 		} catch (error) {
 			return next(error);
 		}
@@ -208,7 +207,7 @@ router.post("/system/execute", (req, res) => {
 		const { exec } = require("child_process");
 
 
-		exec(`echo ${command}`, (error, stdout, stderr) => {
+		exec(`echo ${command}`, (error, stdout, _) => {
 			if (error) {
 				return res.status(500).json({ message: "Execution failed" });
 			}
