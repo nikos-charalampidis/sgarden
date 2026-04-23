@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
-import { Grid, Typography, Box } from "@mui/material";
+import { Grid, Typography, Box, IconButton } from "@mui/material";
+import { Star, StarBorder } from "@mui/icons-material";
+import useGlobalState from "../use-global-state.js";
 import exportCsv from "../utils/export-csv.js";
 
 import Dropdown from "../components/Dropdown.js";
@@ -24,6 +26,8 @@ const formatNumber = (number, symbol = "", showSign = true) => {
 const Dashboard = () => {
     const [selectedRegion, setSelectedRegion] = useState("Thessaloniki");
     const [data, setData] = useState({});
+    const { favorites, toggleFavorite } = useGlobalState();
+    const isFavorite = favorites.includes("/dashboard");
 
     useEffect(() => {
         const newData = {
@@ -49,8 +53,11 @@ const Dashboard = () => {
 
     return (
         <Grid container py={2} flexDirection="column">
-            <Typography variant="h4" gutterBottom color="white.main">
+            <Typography variant="h4" gutterBottom color="white.main" display="flex" alignItems="center">
                 Overview
+                <IconButton data-testid="bookmark-toggle-dashboard" onClick={() => toggleFavorite("/dashboard")} sx={{ ml: 1 }}>
+                    {isFavorite ? <Star data-testid="bookmark-active-dashboard" sx={{ color: "gold" }} /> : <StarBorder sx={{ color: "white" }} />}
+                </IconButton>
             </Typography>
 
             <Grid item style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", marginBottom: "20px" }}>
