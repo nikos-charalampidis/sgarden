@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Grid, Typography, Box, Button, TextField } from "@mui/material";
+import exportCsv from "../utils/export-csv.js";
 import Dropdown from "../components/Dropdown.js";
 import Card from "../components/Card.js";
 import Plot from "../components/Plot.js";
@@ -132,7 +133,16 @@ const Dashboard = () => {
                 </Grid>
 
                 <Grid item sm={12} md={8}>
-                    <Card title="Trends">
+                    <Card
+                        title="Trends"
+                        onExport={() => exportCsv("trends", [
+                            { x: months, y: data.revenue, title: "Revenue" },
+                            { x: months, y: data.expenses, title: "Expenses" },
+                            { x: months, y: data.profit, title: "Profit" },
+                            { x: months, y: data.growthRate, title: "Growth Rate" },
+                        ])}
+                        exportTestId="export-csv-trends"
+                    >
                         <Box display="flex" justifyContent="space-between" mb={1}>
                             <Grid item xs={12} sm={6} display="flex" flexDirection="row" alignItems="center">
                                 <Typography variant="subtitle1" align="center" mr={2}>

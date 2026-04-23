@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Grid, Typography, Box } from "@mui/material";
+import exportCsv from "../utils/export-csv.js";
 
 import Dropdown from "../components/Dropdown.js";
 import Card from "../components/Card.js";
@@ -111,6 +112,8 @@ const Dashboard = () => {
                 <Grid item xs={12} sm={4}>
                     <Card
                         title="Weekly Sales"
+                        onExport={() => exportCsv("weekly-sales", [{ x: ["M", "T", "W", "T", "F", "S", "S"], y: data?.weeklySales, title: "Sales" }])}
+                        exportTestId="export-csv-weekly-sales"
                         footer={(
                             <Grid sx={{ width: "100%", borderTop: "1px solid gray" }}>
                                 <Typography variant="body2" component="p" sx={{ marginTop: "10px" }}>{"🕗 averages (last month)"}</Typography>
@@ -139,6 +142,8 @@ const Dashboard = () => {
                 <Grid item xs={12} sm={4}>
                     <Card
                         title="Revenue Trend"
+                        onExport={() => exportCsv("revenue-trend", [{ x: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Dec"], y: data?.revenueTrend, title: "Revenue" }])}
+                        exportTestId="export-csv-revenue-trend"
                         footer={(
                             <Grid sx={{ width: "100%", borderTop: "1px solid gray" }}>
                                 <Typography variant="body2" component="p" sx={{ marginTop: "10px" }}>{"🕗 updated 4min ago"}</Typography>
@@ -165,6 +170,8 @@ const Dashboard = () => {
                 <Grid item xs={12} sm={4}>
                     <Card
                         title="Customer Satisfaction"
+                        onExport={() => exportCsv("customer-satisfaction", [{ x: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Dec"], y: data?.customerSatisfaction, title: "Satisfaction Score" }])}
+                        exportTestId="export-csv-customer-satisfaction"
                         footer={(
                             <Grid sx={{ width: "100%", borderTop: "1px solid gray" }}>
                                 <Typography variant="body2" component="p" sx={{ marginTop: "10px" }}>{"🕗 just updated"}</Typography>
