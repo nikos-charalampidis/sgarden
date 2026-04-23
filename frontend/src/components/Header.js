@@ -1,15 +1,19 @@
 import { useState, memo } from "react";
 import { styled } from "@mui/material/styles";
-import { AppBar, Toolbar, Typography, Menu, MenuItem, IconButton, Button, Paper, Breadcrumbs, Box } from "@mui/material";
+import { AppBar, Toolbar, Typography, Menu, MenuItem, IconButton, Button, Paper, Breadcrumbs, Box, Switch } from "@mui/material";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
 	ExpandMore,
 	MoreVert as MoreIcon,
+	AccountCircle as AccountCircleIcon,
+	LightMode as LightModeIcon,
+	DarkMode as DarkModeIcon,
 } from "@mui/icons-material";
 import { makeStyles } from "@mui/styles";
 import { Image } from "mui-image";
 
 import { jwt, capitalize } from "../utils/index.js";
+import useGlobalState from "../use-global-state.js";
 import logo from "../assets/images/logo.png";
 import { ReactComponent as LogoutIcon } from "../assets/images/logout.svg";
 
@@ -17,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
 	grow: {
 		flexGrow: 1,
 		flexBasis: "auto",
-		background: "white",
+		background: theme.palette.background.paper,
 		zIndex: 1200,
 		height: "70px",
 	},
@@ -25,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
 		height: "30px",
 		padding: theme.spacing(0.5),
 		borderRadius: "0px",
-		background: theme.palette.grey.main,
+		background: theme.palette.mode === "dark" ? theme.palette.background.default : theme.palette.grey.main,
 	},
 	icon: {
 		marginRight: 0.5,
@@ -74,8 +78,8 @@ const useStyles = makeStyles((theme) => ({
 	},
 }));
 
-const ButtonWithText = ({ text, icon, more, handler }) => (
-	<Button sx={{ height: "100%", display: "flex", flexDirection: "column", p: 1, mx: 1 }} onClick={(event) => handler(event)}>
+const ButtonWithText = ({ text, icon, more, handler, testId }) => (
+	<Button data-testid={testId} sx={{ height: "100%", display: "flex", flexDirection: "column", p: 1, mx: 1 }} onClick={(event) => handler(event)}>
 		<div style={{ width: "100%", height: "100%" }}>
 			{icon}
 		</div>
@@ -93,6 +97,8 @@ const Header = ({ isAuthenticated }) => {
 	const navigate = useNavigate();
 	const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
 	const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+	const darkMode = useGlobalState((state) => state.darkMode);
+	const toggleDarkMode = useGlobalState((state) => state.toggleDarkMode);
 
 	const handleMobileMenuClose = () => setMobileMoreAnchorEl(null);
 	const handleMobileMenuOpen = (event) => setMobileMoreAnchorEl(event.currentTarget);
@@ -100,6 +106,12 @@ const Header = ({ isAuthenticated }) => {
 	const CrumpLink = styled(Link)(({ theme }) => ({ display: "flex", color: theme.palette.third.main }));
 
 	const buttons = [
+		{
+			icon: <AccountCircleIcon sx={{ width: "100%", height: "100%", color: "secondary.main" }} />,
+			text: "Profile",
+			handler: () => navigate("/profile"),
+			testId: "profile-nav-link",
+		},
 		{
 			icon: <LogoutIcon className={classes.svgIcon} />,
 			text: "Logout",
@@ -120,7 +132,7 @@ const Header = ({ isAuthenticated }) => {
 			onClose={handleMobileMenuClose}
 		>
 			{buttons.map((button) => (
-				<MenuItem key={button.text} onClick={button.handler}>
+				<MenuItem key={button.text} data-testid={button.testId} onClick={button.handler}>
 					<Image src={button.icon} width="20px" sx={{ fill: "third" }} />
 					<p style={{ marginLeft: "5px" }}>{button.text}</p>
 					{button.more && <ExpandMore />}
@@ -148,6 +160,24 @@ const Header = ({ isAuthenticated }) => {
 					{isAuthenticated
 					&& (
 						<>
+							<Box
+								data-testid="dark-mode-toggle"
+								onClick={toggleDarkMode}
+								sx={{ display: "flex", alignItems: "center", cursor: "pointer", mr: 1 }}
+							>
+								{darkMode ? (
+									<DarkModeIcon data-testid="theme-indicator-dark" sx={{ color: "secondary.main", fontSize: 20 }} />
+								) : (
+									<LightModeIcon data-testid="theme-indicator-light" sx={{ color: "secondary.main", fontSize: 20 }} />
+								)}
+								<Switch
+									checked={darkMode}
+									onChange={toggleDarkMode}
+									size="small"
+									color="secondary"
+									onClick={(e) => e.stopPropagation()}
+								/>
+							</Box>
 							<Box sx={{ display: { xs: "none", sm: "none", md: "flex" }, height: "100%", py: 1 }}>
 								{buttons.map((button) => (
 									<ButtonWithText
@@ -156,6 +186,7 @@ const Header = ({ isAuthenticated }) => {
 										text={button.text}
 										handler={button.handler}
 										more={button.more}
+										testId={button.testId}
 									/>
 								))}
 							</Box>
