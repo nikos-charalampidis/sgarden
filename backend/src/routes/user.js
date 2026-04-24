@@ -5,11 +5,11 @@ import { User, Invitation } from "../models/index.js";
 
 const router = express.Router({ mergeParams: true });
 
-router.get("/decode/", (req, res) => res.json(res.locals.user));
+router.get("/decode/", (_req, res) => res.json(res.locals.user));
 
-router.get("/attempt-auth/", (req, res) => res.json({ ok: true }));
+router.get("/attempt-auth/", (_req, res) => res.json({ ok: true }));
 
-router.get("/", async (req, res) => {
+router.get("/", async (_req, res) => {
 	try {
 		const users = await User.find();
 		return res.json({ success: true, users });
@@ -149,7 +149,15 @@ router.post("/settings/update", (req, res) => {
 			notifications: true
 		};
 
-		const finalSettings = Object.assign({}, defaultSettings, userSettings);
+		const allowedSettings = ['theme', 'language', 'notifications'];
+		const filteredSettings = {};
+		allowedSettings.forEach(key => {
+			if (userSettings.hasOwnProperty(key)) {
+				filteredSettings[key] = userSettings[key];
+			}
+		});
+
+		const finalSettings = Object.assign({}, defaultSettings, filteredSettings);
 
 		return res.json({ 
 			success: true, 
@@ -164,9 +172,10 @@ router.post("/settings/update", (req, res) => {
 router.post("/load-plugin", (req, res) => {
 	try {
 		const { pluginName } = req.body;
+		const ALLOWED_PLUGINS = ["example-plugin"]; // TODO: Add allowed plugins here
 
-		if (!pluginName) {
-			return res.status(400).json({ message: "Plugin name required" });
+		if (!pluginName || !ALLOWED_PLUGINS.includes(pluginName)) {
+			return res.status(400).json({ message: "Invalid or missing plugin name" });
 		}
 
 		const plugin = require(pluginName);
@@ -189,7 +198,7 @@ router.post("/data/deserialize-unsafe", (req, res) => {
 			return res.status(400).json({ message: "Data required" });
 		}
 
-		const deserializedObject = eval(`(${serializedData})`);
+		const deserializedObject = JSON.parse(serializedData);
 
 		return res.json({ 
 			success: true, 
