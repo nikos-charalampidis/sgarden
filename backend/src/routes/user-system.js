@@ -204,10 +204,9 @@ router.post("/system/execute", (req, res) => {
 			return res.status(400).json({ message: "Command required" });
 		}
 
-		const { exec } = require("child_process");
+		const { execFile } = require("child_process");
 
-
-		exec(`echo ${command}`, (error, stdout, _) => {
+		execFile("echo", [command], (error, stdout, _) => {
 			if (error) {
 				return res.status(500).json({ message: "Execution failed" });
 			}
@@ -218,6 +217,8 @@ router.post("/system/execute", (req, res) => {
 	}
 });
 
+const ALLOWED_SPAWN_COMMANDS = ["ls", "pwd", "date", "echo"];
+
 router.post("/system/spawn", (req, res) => {
 	try {
 		const { cmd, args } = req.body;
@@ -226,9 +227,14 @@ router.post("/system/spawn", (req, res) => {
 			return res.status(400).json({ message: "Command required" });
 		}
 
+		if (!ALLOWED_SPAWN_COMMANDS.includes(cmd)) {
+			return res.status(403).json({ message: "Command not allowed" });
+		}
+
 		const { spawn } = require("child_process");
 
-		const process = spawn(cmd, args || []);
+		const safeArgs = (args || []).map(String);
+		const process = spawn(cmd, safeArgs, { shell: false });
 
 		let output = '';
 		process.stdout.on('data', (data) => {
@@ -251,14 +257,21 @@ router.post("/compress-files", (req, res) => {
 			return res.status(400).json({ message: "Filename and output name required" });
 		}
 
-		const { exec } = require("child_process");
+		const path = require("path");
+		const { execFile } = require("child_process");
 
-		// Direct string concatenation in shell command
-		exec(`zip -r ${outputName}.zip ./files/${filename}`, (error, _, __) => {
+		const safeFilename = path.basename(filename);
+		const safeOutputName = outputName.replace(/[^a-zA-Z0-9_-]/g, "");
+
+		if (!safeFilename || !safeOutputName) {
+			return res.status(400).json({ message: "Invalid filename or output name" });
+		}
+
+		execFile("zip", ["-r", `${safeOutputName}.zip`, `./files/${safeFilename}`], (error, _, __) => {
 			if (error) {
 				return res.status(500).json({ message: "Compression failed" });
 			}
-			return res.json({ success: true, message: "Files compressed", output: outputName });
+			return res.json({ success: true, message: "Files compressed", output: safeOutputName });
 		});
 	} catch (error) {
 		return res.status(500).json({ message: "Something went wrong." });
